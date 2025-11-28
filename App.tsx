@@ -7,7 +7,26 @@ import { Transaction, ReconciliationSummary, MatchResult } from './types';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { ShieldCheck, FileText, Settings, RefreshCw, Database } from 'lucide-react';
 
-const COLORS = ['#10B981', '#F59E0B', '#EF4444', '#6366F1'];
+// Define colors specifically for each status
+// Matched (Green), Potential (Yellow/Orange), Unmatched Bank (Red), Unmatched Book (Purple)
+const COLORS = ['#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
+
+// Custom label to show percentage inside the pie slices
+const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
+  const RADIAN = Math.PI / 180;
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  // Only show label if the slice is big enough (> 5%)
+  if (percent < 0.05) return null;
+
+  return (
+    <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central" className="text-xs font-bold">
+      {`${(percent * 100).toFixed(0)}%`}
+    </text>
+  );
+};
 
 function App() {
   const [bankData, setBankData] = useState<Transaction[]>([]);
@@ -55,8 +74,8 @@ function App() {
 
   // Pie Chart Data
   const pieData = summary ? [
-    { name: 'Matched', value: summary.matchedCount },
-    { name: 'Potential', value: summary.potentialCount },
+    { name: 'Matched (ตรงกัน)', value: summary.matchedCount },
+    { name: 'Potential (รอตรวจสอบ)', value: summary.potentialCount },
     { name: 'Unmatched (Bank)', value: summary.unmatchedBankCount },
     { name: 'Unmatched (Book)', value: summary.unmatchedBookCount },
   ] : [];
@@ -157,13 +176,13 @@ function App() {
               <StatCard title="Total Bank Items" value={summary.totalBank} color="bg-blue-100 text-blue-800" />
               <StatCard title="Matched" value={summary.matchedCount} color="bg-green-100 text-green-800" />
               <StatCard title="Unmatched (Bank)" value={summary.unmatchedBankCount} color="bg-red-100 text-red-800" />
-              <StatCard title="Unmatched (Book)" value={summary.unmatchedBookCount} color="bg-orange-100 text-orange-800" />
+              <StatCard title="Unmatched (Book)" value={summary.unmatchedBookCount} color="bg-purple-100 text-purple-800" />
             </div>
 
             {/* Charts */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                <div className="bg-white p-6 rounded-lg shadow col-span-1 flex flex-col items-center justify-center">
-                  <h3 className="text-lg font-medium mb-4">สัดส่วนผลลัพธ์</h3>
+                  <h3 className="text-lg font-medium mb-4">สัดส่วนผลลัพธ์ (Reconciliation Status)</h3>
                   <div className="w-full h-64">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
@@ -171,6 +190,8 @@ function App() {
                           data={pieData}
                           cx="50%"
                           cy="50%"
+                          labelLine={false}
+                          label={renderCustomizedLabel}
                           innerRadius={60}
                           outerRadius={80}
                           paddingAngle={5}
@@ -180,8 +201,8 @@ function App() {
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                           ))}
                         </Pie>
-                        <Tooltip />
-                        <Legend verticalAlign="bottom" height={36}/>
+                        <Tooltip formatter={(value: number) => [value, 'จำนวนรายการ']} />
+                        <Legend verticalAlign="bottom" height={72} iconType="circle" wrapperStyle={{ fontSize: '12px' }}/>
                       </PieChart>
                     </ResponsiveContainer>
                   </div>
