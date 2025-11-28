@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { FileUpload } from './components/FileUpload';
 import { MatchTable } from './components/MatchTable';
 import { parseCSV } from './utils/csvParser';
@@ -176,7 +176,7 @@ function App() {
                           paddingAngle={5}
                           dataKey="value"
                         >
-                          {pieData.map((entry, index) => (
+                          {pieData.map((_, index) => (
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                           ))}
                         </Pie>
