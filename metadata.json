@@ -1,0 +1,5 @@
+{
+  "name": "ReconAI - Financial Reconciliation",
+  "description": "แอปพลิเคชันช่วยกระทบยอดบัญชี (Reconciliation) ระหว่าง Bank Statement และ GL Book โดยอัตโนมัติด้วย AI",
+  "requestFramePermissions": []
+}
