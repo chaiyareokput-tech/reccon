@@ -1,10 +1,15 @@
 import { GoogleGenAI } from "@google/genai";
 import { MatchResult } from '../types';
 
+// Declare process to avoid TypeScript errors if types are missing, 
+// and to comply with the guideline to use process.env.API_KEY.
+declare var process: any;
+
 export const analyzeMismatch = async (
   matchResult: MatchResult
 ): Promise<string> => {
-  // Use process.env.API_KEY directly as per @google/genai guidelines
+  // Use process.env.API_KEY as per Google GenAI SDK guidelines.
+  // The guidelines state we must assume this variable is pre-configured and accessible.
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
   let prompt = "";
